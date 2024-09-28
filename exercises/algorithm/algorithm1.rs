@@ -8,13 +8,13 @@ use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
 use std::vec::*;
 
-#[derive(Debug)]
+#[derive(Debug,Ord, PartialOrd, Eq, PartialEq)]
 struct Node<T> {
     val: T,
     next: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Node<T> {
+impl<T:Ord + PartialOrd + Eq + PartialEq> Node<T> {
     fn new(t: T) -> Node<T> {
         Node {
             val: t,
@@ -23,19 +23,19 @@ impl<T> Node<T> {
     }
 }
 #[derive(Debug)]
-struct LinkedList<T> {
+struct LinkedList<T:Ord + PartialOrd + Eq + PartialEq> {
     length: u32,
     start: Option<NonNull<Node<T>>>,
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T:Ord + PartialOrd + Eq + PartialEq +Clone> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T:Ord + PartialOrd + Eq + PartialEq + Clone>  LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -56,11 +56,11 @@ impl<T> LinkedList<T> {
         self.length += 1;
     }
 
-    pub fn get(&mut self, index: i32) -> Option<&T> {
+    pub fn get(&self, index: i32) -> Option<&T> {
         self.get_ith_node(self.start, index)
     }
 
-    fn get_ith_node(&mut self, node: Option<NonNull<Node<T>>>, index: i32) -> Option<&T> {
+    fn get_ith_node(&self, node: Option<NonNull<Node<T>>>, index: i32) -> Option<&T> {
         match node {
             None => None,
             Some(next_ptr) => match index {
@@ -71,18 +71,44 @@ impl<T> LinkedList<T> {
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
 	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+
+        let len = list_a.length as i32;
+
+        let len1 = list_b.length as i32;
+
+        let mut vec = vec![];
+
+        for idx in 0..len   {
+           let item= list_a.get(idx).unwrap();
+            vec.push(item);
         }
+
+        for idx in 0..len1   {
+            let item= list_b.get(idx).unwrap();
+
+
+            vec.push(item);
+        }
+
+
+        vec.sort();
+
+        let mut mergeVec = Self::new();
+        mergeVec.length = list_a.length + list_b.length;
+
+        for item in vec {
+            mergeVec.add(item.clone());
+        }
+
+        return  mergeVec;
+
+
 	}
 }
 
 impl<T> Display for LinkedList<T>
 where
-    T: Display,
+    T: Display +Ord + PartialOrd + Eq + PartialEq
 {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match self.start {

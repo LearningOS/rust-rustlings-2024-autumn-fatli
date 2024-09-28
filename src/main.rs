@@ -153,15 +153,6 @@ pub struct ExerciseStatistics {
 #[tokio::main]
 async fn main() {
 
-    let mut hasmMap = HashMap::new();
-  
-    if hasmMap.contains_key("rustlings") {
-
-    }
-    else {
-        hasmMap.insert(k, v)
-    }
-    
 
 
     let args: Args = argh::from_env();
