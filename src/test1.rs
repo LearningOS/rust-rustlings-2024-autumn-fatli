@@ -13,9 +13,7 @@ where
 {
     // 创建一个新的空堆
     pub fn new() -> Self {
-        Heap {
-            items: Vec::new(),
-        }
+        Heap { items: Vec::new() }
     }
 
     // 获取堆的长度
@@ -39,7 +37,8 @@ where
         let mut index = idx;
         while index > 0 {
             let parent_index = self.parent_idx(index);
-            if self.items[index] < self.items[parent_index] { // 最小堆
+            if self.items[index] < self.items[parent_index] {
+                // 最小堆
                 self.items.swap(index, parent_index);
                 index = parent_index; // 更新到父节点
             } else {
