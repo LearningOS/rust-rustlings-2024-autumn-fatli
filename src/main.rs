@@ -152,9 +152,7 @@ pub struct ExerciseStatistics {
 
 #[tokio::main]
 async fn main() {
-
-
-
+  
     let args: Args = argh::from_env();
 
     if args.version {
@@ -174,9 +172,6 @@ async fn main() {
         println!("Try `cd rustlings/`!");
         std::process::exit(1);
     }
-
- 
-  
 
     if !rustc_exists() {
         println!("We cannot find `rustc`.");

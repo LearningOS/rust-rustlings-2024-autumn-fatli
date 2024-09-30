@@ -1,6 +1,6 @@
 /*
-	heap
-	This question requires you to implement a binary heap function
+    heap
+    This question requires you to implement a binary heap function
 */
 // I AM NOT DONE
 
@@ -18,7 +18,7 @@ where
 
 impl<T> Heap<T>
 where
-    T: Default,
+    T: Default + std::cmp::PartialOrd,
 {
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
@@ -37,7 +37,23 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value); // 将新元素添加到底部
+        self.bubble_up(self.len() - 1); // 上浮元素
+    }
+
+    // 上浮操作
+    pub(self) fn bubble_up(&mut self, idx: usize) {
+        let mut index = idx;
+        while index > 0 {
+            let parent_index = self.parent_idx(index);
+            if self.items[index] < self.items[parent_index] {
+                // 最小堆
+                self.items.swap(index, parent_index);
+                index = parent_index; // 更新到父节点
+            } else {
+                break; // 如果父节点更小，停止上浮
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -58,7 +74,7 @@ where
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
-		0
+        0
     }
 }
 
@@ -85,7 +101,7 @@ where
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+        None
     }
 }
 
