@@ -2,14 +2,14 @@
     heap
     This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
+
 
 use std::cmp::Ord;
 use std::default::Default;
 
 pub struct Heap<T>
 where
-    T: Default,
+    T:  Default + std::cmp::PartialEq<i32>,
 {
     count: usize,
     items: Vec<T>,
@@ -18,12 +18,12 @@ where
 
 impl<T> Heap<T>
 where
-    T: Default + std::cmp::PartialOrd,
+    T:   Default + std::cmp::PartialEq<i32>,
 {
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
             count: 0,
-            items: vec![T::default()],
+            items: vec![],
             comparator,
         }
     }
@@ -37,21 +37,67 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        self.items.push(value); // 将新元素添加到底部
-        self.bubble_up(self.len() - 1); // 上浮元素
+        self.items.push(value);
+        self.buble_up(self.items.len() - 1);
+        self.count += 1;
     }
 
-    // 上浮操作
-    pub(self) fn bubble_up(&mut self, idx: usize) {
-        let mut index = idx;
+    /// 删除堆顶元素
+    pub(self) fn pop(&mut self) -> Option<T> {
+        if self.items.is_empty() {
+            return None;
+        }
+        if self.items.len() == 1 {
+            return Some(self.items.pop().unwrap());
+        }
+
+        let min = self.items.swap_remove(0);
+        
+        self.bubble_down(0);
+        if min ==0 {
+            None
+        }else{
+            Some(min)
+        }
+        
+    }
+
+    pub(self) fn buble_up(&mut self, mut index: usize) {
         while index > 0 {
-            let parent_index = self.parent_idx(index);
-            if self.items[index] < self.items[parent_index] {
-                // 最小堆
-                self.items.swap(index, parent_index);
-                index = parent_index; // 更新到父节点
+            let praentIdx = self.parent_idx(index);
+            if (self.comparator)(&self.items[praentIdx], &self.items[index]) {
+                break;
+            }
+            self.items.swap(index, praentIdx);
+            index = self.parent_idx(index);
+        }
+    }
+
+    /// 下沉操作
+    pub(self) fn bubble_down(&mut self, mut index: usize) {
+        loop {
+            let left_child_index = 2 * index + 1;
+            let right_child_index = 2 * index + 2;
+
+            let mut smallest = index;
+
+            if left_child_index < self.items.len()
+                && (self.comparator)(&self.items[left_child_index], &self.items[smallest])
+            {
+                smallest = left_child_index;
+            }
+
+            if right_child_index < self.items.len()
+                && (self.comparator)(&self.items[right_child_index], &self.items[smallest])
+            {
+                smallest = right_child_index;
+            }
+
+            if smallest != index {
+                self.items.swap(index, smallest);
+                index = smallest;
             } else {
-                break; // 如果父节点更小，停止上浮
+                break;
             }
         }
     }
@@ -80,7 +126,7 @@ where
 
 impl<T> Heap<T>
 where
-    T: Default + Ord,
+    T: Default + Ord +  std::cmp::PartialEq<i32>
 {
     /// Create a new MinHeap
     pub fn new_min() -> Self {
@@ -95,13 +141,12 @@ where
 
 impl<T> Iterator for Heap<T>
 where
-    T: Default,
+    T: Default + Ord +  std::cmp::PartialEq<i32>
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-        None
+        self.pop()
     }
 }
 
@@ -111,7 +156,7 @@ impl MinHeap {
     #[allow(clippy::new_ret_no_self)]
     pub fn new<T>() -> Heap<T>
     where
-        T: Default + Ord,
+        T: Default + Ord +  std::cmp::PartialEq<i32>
     {
         Heap::new(|a, b| a < b)
     }
@@ -123,7 +168,7 @@ impl MaxHeap {
     #[allow(clippy::new_ret_no_self)]
     pub fn new<T>() -> Heap<T>
     where
-        T: Default + Ord,
+        T: Default + Ord +  std::cmp::PartialEq<i32>
     {
         Heap::new(|a, b| a > b)
     }
@@ -166,5 +211,7 @@ mod tests {
         assert_eq!(heap.next(), Some(4));
         heap.add(1);
         assert_eq!(heap.next(), Some(2));
+        assert_eq!(heap.next(), Some(1));
+ 
     }
 }
